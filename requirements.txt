@@ -1,0 +1,5 @@
+Django>=3.2.4,<3.3
+channels-redis==4.1.0
+uvicorn==0.22.0
+websockets==11.0.3
+daphne==4.0.0

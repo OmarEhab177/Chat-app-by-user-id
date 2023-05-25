@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Chat</title>
+    <style>
+        #chat-log {
+            height: 500px;
+            border: 1px solid #ddd;
+            margin-bottom: 10px;
+            overflow-y: scroll;
+        }
+        .message {
+            padding: 10px;
+            margin-bottom: 10px;
+            border-radius: 5px;
+        }
+        .own-message {
+            background-color: #0084ff;
+            color: white;
+            text-align: right;
+            margin-left: 20%;
+        }
+        .other-message {
+            background-color: #eee;
+            margin-right: 20%;
+        }
+    </style>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', (event) => {
+            // Get user ID from Django template context.
+            const userId = "{{ user_id }}";
+            const otherUserId = "{{ other_user_id }}";
+
+            // Create a WebSocket connection to the server.
+            const chatSocket = new WebSocket(
+                'ws://' + window.location.host +
+                '/ws/chat/' + userId + '/' + otherUserId + '/'
+            );
+
+            chatSocket.onmessage = function(e) {
+                const data = JSON.parse(e.data);
+                const message = data['message'];
+                const messageUserId = data['user_id'];
+
+                var p = document.createElement('p');
+
+                // If the message was sent by the current user, align it to the right.
+                if (messageUserId === userId) {
+                    p.classList.add('own-message');
+                } else {
+                    p.classList.add('other-message');
+                }
+
+                p.innerHTML = message;
+                document.querySelector('#chat-log').appendChild(p);
+            };
+
+            chatSocket.onclose = function(e) {
+                console.error('Chat socket closed unexpectedly');
+            };
+
+            document.querySelector('#chat-message-input').focus();
+            document.querySelector('#chat-message-input').onkeyup = function(e) {
+                if (e.keyCode === 13) {  // enter, return
+                    document.querySelector('#chat-message-submit').click();
+                }
+            };
+
+            document.querySelector('#chat-message-submit').onclick = function(e) {
+                const messageInputDom = document.querySelector('#chat-message-input');
+                const message = messageInputDom.value;
+                chatSocket.send(JSON.stringify({
+                    'message': message
+                }));
+                messageInputDom.value = '';
+            };
+        });
+    </script>
+</head>
+<body>
+    <textarea id="chat-message-input" cols="100"></textarea>
+    <input id="chat-message-submit" type="button" value="Send">
+    <div id="chat-log"></div>
+</body>
+</html>

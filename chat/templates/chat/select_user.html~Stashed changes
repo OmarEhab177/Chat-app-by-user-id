@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Select User</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f4f4;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+        form {
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 5px;
+            box-shadow: 0px 0px 10px 0px rgba(0,0,0,0.1);
+        }
+        label, select, input {
+            display: block;
+            margin-bottom: 20px;
+            width: 100%;
+        }
+        input[type="submit"] {
+            background-color: #0084ff;
+            color: white;
+            cursor: pointer;
+            border: none;
+        }
+        input[type="submit"]:hover {
+            background-color: #005cbf;
+        }
+    </style>
+</head>
+<body>
+    <h1>Select User</h1>
+    <form id="user-selection-form" action="{% url 'chat_page' %}" method="GET">
+        <input type="hidden" id="current_user_id" name="current_user_id" value="{{ current_user_id }}">
+        <select name="other_user_id" id="other_user_id">
+            {% for user in users %}
+                <option value="{{ user.id }}">{{ user.username }}</option>
+            {% endfor %}
+        </select>
+        <input type="submit" value="Chat">
+    </form>
+
+    <!-- <script>
+        document.getElementById('user-selection-form').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const userId = document.getElementById('current_user_id').value;
+            const otherUserId = document.getElementById('other_user_id').value;
+            window.location.href = '/chat?current_user_id=' + userId + '&other_user_id=' + otherUserId;
+        });
+    </script> -->
+</body>
+</html>
